@@ -20,6 +20,27 @@ And add the module you need to your target's dependencies:
 .product(name: "MLXEmbeddersTokenizers", package: "swift-tokenizers-mlx"),
 ```
 
+## Tokenizer backend
+
+Swift Tokenizers supports two backends behind the same API:
+
+- **Swift** (default): Swift implementation with a C dependency (yyjson) for JSON parsing.
+- **Rust**: uses a prebuilt Rust binary for faster tokenization and decoding. Includes its own JSON parser and Jinja template engine.
+
+By default the Swift backend is used. To opt into the Rust backend, enable the `Rust` trait on this package:
+
+```swift
+.package(
+    url: "https://github.com/DePasqualeOrg/swift-tokenizers-mlx/",
+    from: "0.1.2",
+    traits: ["Rust"]
+),
+```
+
+The two backends are mutually exclusive – do not combine `Swift` and `Rust`.
+
+For Xcode projects, select the trait in the package dependency settings.
+
 ## Usage
 
 `MLXLMTokenizers` provides convenience overloads with a default tokenizer loader, so you can omit the `using:` parameter:
