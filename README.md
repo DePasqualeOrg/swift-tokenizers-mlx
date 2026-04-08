@@ -22,12 +22,17 @@ And add the module you need to your target's dependencies:
 
 ## Tokenizer backend
 
-Swift Tokenizers supports two backends behind the same API:
+Swift Tokenizers provides two backends using Swift package traits:
 
-- **Swift** (default): Swift implementation with a C dependency (yyjson) for JSON parsing.
-- **Rust**: uses a prebuilt Rust binary for faster tokenization and decoding. Includes its own JSON parser and Jinja template engine.
+| | Swift (default) | Rust (opt-in) |
+|---|---|---|
+| Tokenization | Swift | [tokenizers](https://github.com/huggingface/tokenizers) |
+| Chat templates | [Swift Jinja](https://github.com/huggingface/swift-jinja) | [MiniJinja](https://github.com/mitsuhiko/minijinja) |
+| JSON parsing | [yyjson](https://github.com/ibireme/yyjson) (C) | [serde](https://github.com/serde-rs/serde) |
 
-By default the Swift backend is used. To opt into the Rust backend, enable the `Rust` trait on this package:
+The opt-in `Rust` trait links a Rust binary and excludes the corresponding Swift implementations for even faster performance than the optimized Swift backend.
+
+To opt into the Rust backend, enable the `Rust` trait on this package:
 
 ```swift
 .package(
@@ -37,7 +42,7 @@ By default the Swift backend is used. To opt into the Rust backend, enable the `
 ),
 ```
 
-The two backends are mutually exclusive – do not combine `Swift` and `Rust`.
+The package traits are mutually exclusive – do not combine `Swift` and `Rust`.
 
 For Xcode projects, select the trait in the package dependency settings.
 
@@ -95,15 +100,21 @@ Integration tests for inference and benchmarks are included.
 
 ## Benchmarks
 
-The benchmarks use tests from MLX Swift LM and can be run from this package in Xcode.
+| | Swift Transformers | Swift backend | | Rust backend | |
+| --- | ---: | ---: | --- | ---: | --- |
+| Tokenizer load | 399.3 ms | 177.5 ms | 2.2x faster | 168.4 ms | 2.4x faster |
+| Tokenization | 48.4 ms | 23.7 ms | 2.0x faster | 3.5 ms | 13.8x faster |
+| Decoding | 30.9 ms | 15.7 ms | 2.0x faster | 3.9 ms | 7.9x faster |
+| LLM load | 409.7 ms | 197.4 ms | 2.1x faster | 191.3 ms | 2.1x faster |
+| VLM load | 441.6 ms | 223.2 ms | 2.0x faster | 226.4 ms | 2.0x faster |
+| Embedding load | 412.0 ms | 193.8 ms | 2.1x faster | 209.8 ms | 2.1x faster |
 
-These results were observed on an M3 MacBook Pro.
+These results were observed on an M3 MacBook Pro using Swift Tokenizers [`0.3.1`](https://github.com/DePasqualeOrg/swift-tokenizers/releases/tag/0.3.1), Swift Transformers [`1.3.0`](https://github.com/huggingface/swift-transformers/releases/tag/1.3.0), and MLX Swift LM `8c9dd63`.
 
-| Benchmark | Swift Tokenizers median | Swift Transformers median | Swift Tokenizers Performance |
-| --- | ---: | ---: | --- |
-| Tokenizer load | 289.6 ms | 1004.6 ms | 3.47x faster |
-| Tokenization | 53.0 ms | 105.8 ms | 2.00x faster |
-| Decoding | 28.9 ms | 48.4 ms | 1.67x faster |
-| LLM load | 318.8 ms | 1033.5 ms | 3.24x faster |
-| VLM load | 367.9 ms | 1081.5 ms | 2.94x faster |
-| Embedding load | 310.7 ms | 1023.5 ms | 3.29x faster |
+### Running benchmarks
+
+The benchmarks use tests from MLX Swift LM and can be run from this package in Xcode or from the command line with `xcodebuild`:
+
+```bash
+xcodebuild test -scheme swift-tokenizers-mlx-Package -configuration Release -destination 'platform=macOS,arch=arm64' -only-testing:Benchmarks
+```
