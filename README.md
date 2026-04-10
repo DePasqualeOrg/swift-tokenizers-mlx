@@ -9,7 +9,7 @@ Refer to the [Benchmarks](#Benchmarks) section to compare the performance of Swi
 Add this package alongside MLX Swift LM in your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/DePasqualeOrg/swift-tokenizers-mlx/", from: "0.1.0"),
+.package(url: "https://github.com/DePasqualeOrg/swift-tokenizers-mlx/", from: "0.1.3", traits: ["Swift"]),
 ```
 
 And add the module you need to your target's dependencies:
@@ -37,7 +37,7 @@ To opt into the Rust backend, enable the `Rust` trait on this package:
 ```swift
 .package(
     url: "https://github.com/DePasqualeOrg/swift-tokenizers-mlx/",
-    from: "0.1.2",
+    from: "0.1.3",
     traits: ["Rust"]
 ),
 ```
