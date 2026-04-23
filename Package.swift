@@ -44,6 +44,7 @@ var packageTargets: [Target] = [
             "TestHelpers",
             .product(name: "HFAPI", package: "swift-hf-api"),
             .product(name: "IntegrationTestHelpers", package: "mlx-swift-lm"),
+            .product(name: "MLXLLM", package: "mlx-swift-lm"),
         ]
     ),
 ]
