@@ -100,12 +100,21 @@ Benchmarks are included by default. Integration tests are opt-in and download mo
 
 ### Running integration tests
 
-In Xcode, set `TOKENIZERS_MLX_ENABLE_INTEGRATION_TESTS=1` in the test scheme environment.
+In Xcode, set `TOKENIZERS_MLX_ENABLE_INTEGRATION_TESTS=1` in the test scheme environment. To run against the Rust backend, also enable the `Rust` trait under **File → Packages → Package Traits…**.
 
-From the command line, run MLX-backed tests with `xcodebuild` and the test-runner passthrough variable:
+From the command line, run MLX-backed tests with `xcodebuild`. Two env vars are involved and they sit at different layers:
+
+- `TEST_RUNNER_TOKENIZERS_MLX_ENABLE_INTEGRATION_TESTS=1` is the runtime suite gate; the `TEST_RUNNER_` prefix tells xcodebuild to forward the variable into the test host.
+- `TOKENIZERS_BACKEND=Rust` flips the default trait at manifest-evaluation time, so it is set on the `xcodebuild` process itself rather than forwarded.
 
 ```bash
+# Swift backend (default)
 TEST_RUNNER_TOKENIZERS_MLX_ENABLE_INTEGRATION_TESTS=1 \
+  xcodebuild test -scheme swift-tokenizers-mlx-Package -destination 'platform=macOS,arch=arm64' -only-testing:IntegrationTests
+
+# Rust backend
+TOKENIZERS_BACKEND=Rust \
+  TEST_RUNNER_TOKENIZERS_MLX_ENABLE_INTEGRATION_TESTS=1 \
   xcodebuild test -scheme swift-tokenizers-mlx-Package -destination 'platform=macOS,arch=arm64' -only-testing:IntegrationTests
 ```
 
@@ -113,19 +122,23 @@ TEST_RUNNER_TOKENIZERS_MLX_ENABLE_INTEGRATION_TESTS=1 \
 
 | | Swift Transformers | Swift backend | | Rust backend | |
 | --- | ---: | ---: | --- | ---: | --- |
-| Tokenizer load | 399.3 ms | 177.5 ms | 2.2x faster | 168.4 ms | 2.4x faster |
-| Tokenization | 48.4 ms | 23.7 ms | 2.0x faster | 3.5 ms | 13.8x faster |
-| Decoding | 30.9 ms | 15.7 ms | 2.0x faster | 3.9 ms | 7.9x faster |
-| LLM load | 409.7 ms | 197.4 ms | 2.1x faster | 191.3 ms | 2.1x faster |
-| VLM load | 441.6 ms | 223.2 ms | 2.0x faster | 226.4 ms | 2.0x faster |
-| Embedding load | 412.0 ms | 193.8 ms | 2.1x faster | 209.8 ms | 2.1x faster |
+| Tokenizer load | 399.3 ms | 174.4 ms | 2.3x faster | 167.4 ms | 2.4x faster |
+| Tokenization | 48.4 ms | 23.4 ms | 2.1x faster | 3.5 ms | 13.8x faster |
+| Decoding | 30.9 ms | 14.9 ms | 2.1x faster | 3.7 ms | 8.4x faster |
+| LLM load | 409.7 ms | 191.0 ms | 2.1x faster | 181.4 ms | 2.3x faster |
+| VLM load | 441.6 ms | 234.0 ms | 1.9x faster | 226.3 ms | 2.0x faster |
+| Embedding load | 412.0 ms | 202.1 ms | 2.0x faster | 194.4 ms | 2.1x faster |
 
-These results were observed on an M3 MacBook Pro using Swift Tokenizers [`0.3.1`](https://github.com/DePasqualeOrg/swift-tokenizers/releases/tag/0.3.1), Swift Transformers [`1.3.0`](https://github.com/huggingface/swift-transformers/releases/tag/1.3.0), and MLX Swift LM `8c9dd63`.
+These results were observed on an M3 MacBook Pro using Swift Tokenizers [`0.4.2`](https://github.com/DePasqualeOrg/swift-tokenizers/releases/tag/0.4.2), Swift Transformers [`1.3.0`](https://github.com/huggingface/swift-transformers/releases/tag/1.3.0), and MLX Swift LM [`3.31.3`](https://github.com/ml-explore/mlx-swift-lm/releases/tag/3.31.3).
 
 ### Running benchmarks
 
-The benchmarks use tests from MLX Swift LM and can be run from this package in Xcode or from the command line with `xcodebuild`:
+The benchmarks use tests from MLX Swift LM and can be run from this package in Xcode or from the command line with `xcodebuild`. `xcodebuild` does not support `--traits`, so setting `TOKENIZERS_BACKEND=Rust` flips the package's default trait at manifest-evaluation time to let xcodebuild drive the Rust backend:
 
 ```bash
+# Swift backend (default)
 xcodebuild test -scheme swift-tokenizers-mlx-Package -configuration Release -destination 'platform=macOS,arch=arm64' -only-testing:Benchmarks
+
+# Rust backend
+TOKENIZERS_BACKEND=Rust xcodebuild test -scheme swift-tokenizers-mlx-Package -configuration Release -destination 'platform=macOS,arch=arm64' -only-testing:Benchmarks
 ```

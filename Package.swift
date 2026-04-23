@@ -2,6 +2,21 @@
 
 import PackageDescription
 
+// Tokenizer backend to build against when working on this package directly
+// (running integration tests, benchmarks, etc.). Defaults to "Swift"; set
+// `TOKENIZERS_BACKEND=Rust` in the environment before running `swift test`
+// or `xcodebuild test` to flip. Downstream consumers don't need to touch
+// this — they select a trait on the swift-tokenizers-mlx dependency in
+// their own Package.swift.
+//
+// The chosen value is applied in two places: as this package's default trait,
+// and as the sole trait enabled on the swift-tokenizers dependency. Both are
+// hardcoded at manifest-evaluation time rather than propagated via
+// `.trait(name: condition:)` because SPM's conditional propagation is
+// additive — it wouldn't override the dependency's own default trait,
+// leaving both backends enabled at once.
+let backendTrait = Context.environment["TOKENIZERS_BACKEND"] == "Rust" ? "Rust" : "Swift"
+
 var packageTargets: [Target] = [
     .target(
         name: "MLXLMTokenizers",
@@ -62,18 +77,16 @@ let package = Package(
         .library(name: "MLXEmbeddersTokenizers", targets: ["MLXEmbeddersTokenizers"]),
     ],
     traits: [
-        .default(enabledTraits: ["Swift"]),
+        .default(enabledTraits: [backendTrait]),
         .trait(name: "Swift"),
         .trait(name: "Rust"),
     ],
     dependencies: [
         .package(url: "https://github.com/ml-explore/mlx-swift-lm.git", from: "3.31.3"),
         .package(
-            url: "https://github.com/DePasqualeOrg/swift-tokenizers.git", from: "0.3.2",
-            traits: [
-                .trait(name: "Swift", condition: .when(traits: ["Swift"])),
-                .trait(name: "Rust", condition: .when(traits: ["Rust"])),
-            ]),
+            url: "https://github.com/DePasqualeOrg/swift-tokenizers.git",
+            from: "0.4.2",
+            traits: [.init(name: backendTrait)]),
         .package(url: "https://github.com/DePasqualeOrg/swift-hf-api.git", from: "0.2.2"),
     ],
     targets: packageTargets
