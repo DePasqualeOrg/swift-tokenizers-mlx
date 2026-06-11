@@ -18,8 +18,9 @@ let package = Package(
         .package(url: "https://github.com/DePasqualeOrg/mlx-swift-lm.git", branch: "main"),
         // Minor releases of swift-tokenizers have been API-breaking; bump deliberately.
         .package(url: "https://github.com/DePasqualeOrg/swift-tokenizers.git", .upToNextMinor(from: "0.7.0")),
-        // swift-hf-api 0.4.0 renames HubClient to HFClient; stay on 0.3.x until the migration.
-        .package(url: "https://github.com/DePasqualeOrg/swift-hf-api.git", .upToNextMinor(from: "0.3.2")),
+        // 0.4.1 is the floor: its artifactbundle localizes non-FFI Rust globals, fixing
+        // duplicate-symbol link failures alongside other Rust-backed packages.
+        .package(url: "https://github.com/DePasqualeOrg/swift-hf-api.git", .upToNextMinor(from: "0.4.1")),
     ],
     targets: [
         .target(

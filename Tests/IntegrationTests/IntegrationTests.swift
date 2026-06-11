@@ -11,7 +11,7 @@ private let integrationTestsEnabled =
     ProcessInfo.processInfo.environment["TOKENIZERS_MLX_ENABLE_INTEGRATION_TESTS"] == "1"
 
 private let models = IntegrationTestModels(
-    downloader: HubClient.default, tokenizerLoader: TokenizersLoader())
+    downloader: HFClient.default, tokenizerLoader: TokenizersLoader())
 
 @Suite(.serialized, .enabled(if: integrationTestsEnabled))
 struct IntegrationTests {
@@ -56,7 +56,7 @@ struct IntegrationTests {
     /// would silently degrade to the cleanup-prone decode fallback, so pin the
     /// contract here.
     @Test func streamingDecodeConformance() async throws {
-        let directory = try await HubClient.default.download(
+        let directory = try await HFClient.default.download(
             id: IntegrationTestModelIDs.llm,
             revision: nil,
             matching: ["*.json", "*.jinja"],

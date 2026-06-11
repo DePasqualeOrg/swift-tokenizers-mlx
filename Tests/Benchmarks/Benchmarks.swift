@@ -10,7 +10,7 @@ import Testing
 struct Benchmarks {
     @Test func loadTokenizer() async throws {
         let stats = try await benchmarkTokenizerLoading(
-            from: HubClient.default,
+            from: HFClient.default,
             using: TokenizersLoader()
         )
         stats.printSummary(label: "Tokenizer load (swift-tokenizers)")
@@ -19,7 +19,7 @@ struct Benchmarks {
     @Test func tokenizeText() async throws {
         let sampleText = try await loadTokenizationBenchmarkText()
         let stats = try await benchmarkTokenization(
-            from: HubClient.default,
+            from: HFClient.default,
             using: TokenizersLoader(),
             text: sampleText
         )
@@ -29,7 +29,7 @@ struct Benchmarks {
     @Test func decodeText() async throws {
         let sampleText = try await loadDecodingBenchmarkText()
         let stats = try await benchmarkDecoding(
-            from: HubClient.default,
+            from: HFClient.default,
             using: TokenizersLoader(),
             text: sampleText
         )
@@ -38,7 +38,7 @@ struct Benchmarks {
 
     @Test func loadLLM() async throws {
         let stats = try await benchmarkLLMLoading(
-            from: HubClient.default,
+            from: HFClient.default,
             using: TokenizersLoader()
         )
         stats.printSummary(label: "LLM load (swift-tokenizers)")
@@ -46,7 +46,7 @@ struct Benchmarks {
 
     @Test func loadVLM() async throws {
         let stats = try await benchmarkVLMLoading(
-            from: HubClient.default,
+            from: HFClient.default,
             using: TokenizersLoader()
         )
         stats.printSummary(label: "VLM load (swift-tokenizers)")
@@ -54,7 +54,7 @@ struct Benchmarks {
 
     @Test func loadEmbedding() async throws {
         let stats = try await benchmarkEmbeddingLoading(
-            from: HubClient.default,
+            from: HFClient.default,
             using: TokenizersLoader()
         )
         stats.printSummary(label: "Embedding load (swift-tokenizers)")
@@ -62,7 +62,7 @@ struct Benchmarks {
 
     @Test func embeddingConvenience() async throws {
         let config = EmbedderRegistry.minilm_l6_4bit
-        let hub = HubClient.default
+        let hub = HFClient.default
 
         // Free function loadModelContainer (downloader, default TokenizersLoader)
         let container = try await MLXEmbeddersTokenizers.loadModelContainer(

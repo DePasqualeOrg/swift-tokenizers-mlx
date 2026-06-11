@@ -33,7 +33,7 @@ import MLXLMTokenizers
 
 // TokenizersLoader is used automatically
 let model = try await loadModel(
-    from: HubClient.default,
+    from: HFClient.default,
     id: "mlx-community/Qwen3-4B-4bit"
 )
 ```
@@ -51,7 +51,7 @@ You can also pass `TokenizersLoader()` explicitly to the core API:
 
 ```swift
 let container = try await loadModelContainer(
-    from: HubClient.default,
+    from: HFClient.default,
     using: TokenizersLoader(),
     id: "mlx-community/Qwen3-4B-4bit"
 )
@@ -65,7 +65,7 @@ import MLXEmbeddersTokenizers
 import MLXEmbeddersHFAPI
 
 let container = try await loadModelContainer(
-    from: HubClient.default,
+    from: HFClient.default,
     configuration: EmbedderRegistry.qwen3_embedding
 )
 ```
@@ -97,6 +97,8 @@ TEST_RUNNER_TOKENIZERS_MLX_ENABLE_INTEGRATION_TESTS=1 \
 | Embedding load | 414.3 ms | 197.7 ms | 2.1x faster |
 
 These results were observed on an M3 MacBook Pro using Swift Tokenizers [`0.5.0`](https://github.com/DePasqualeOrg/swift-tokenizers/releases/tag/0.5.0), Swift Transformers [`1.3.2`](https://github.com/huggingface/swift-transformers/releases/tag/1.3.2), and MLX Swift LM [`3.31.3`](https://github.com/ml-explore/mlx-swift-lm/releases/tag/3.31.3).
+
+A re-run on the same machine in June 2026 with Swift Tokenizers [`0.7.0`](https://github.com/DePasqualeOrg/swift-tokenizers/releases/tag/0.7.0), the Rust-backed Swift HF API 0.4.x, and the DePasqualeOrg mlx-swift-lm fork produced: tokenizer load 192.9 ms, tokenization 5.0 ms, decoding 4.8 ms, LLM load 226.7 ms, VLM load 302.1 ms, and embedding load 245.4 ms (medians, release configuration). The Swift Transformers column has not been re-measured on that stack.
 
 ### Running benchmarks
 
