@@ -1,6 +1,8 @@
 # Swift Tokenizers MLX
 
-This package allows [Swift Tokenizers](https://github.com/DePasqualeOrg/swift-tokenizers) to seamlessly integrate with [MLX Swift LM](https://github.com/ml-explore/mlx-swift-lm) by providing protocol conformance and convenience overloads.
+This package allows [Swift Tokenizers](https://github.com/DePasqualeOrg/swift-tokenizers) to seamlessly integrate with [MLX Swift LM](https://github.com/DePasqualeOrg/mlx-swift-lm) by providing protocol conformance and convenience overloads.
+
+This package depends on [DePasqualeOrg/mlx-swift-lm](https://github.com/DePasqualeOrg/mlx-swift-lm), an independently maintained fork of ml-explore/mlx-swift-lm with a throwing tokenizer API. Because SwiftPM resolves each package identity to a single URL, consumers must also use the fork's URL for `mlx-swift-lm` (and `DePasqualeOrg/mlx-swift`) rather than the ml-explore URLs.
 
 Refer to the [Benchmarks](#Benchmarks) section to compare the performance of Swift Tokenizers and Swift Transformers.
 
@@ -9,7 +11,7 @@ Refer to the [Benchmarks](#Benchmarks) section to compare the performance of Swi
 Add this package alongside MLX Swift LM in your `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/DePasqualeOrg/swift-tokenizers-mlx/", from: "0.3.0"),
+.package(url: "https://github.com/DePasqualeOrg/swift-tokenizers-mlx/", branch: "main"),
 ```
 
 And add the module you need to your target's dependencies:

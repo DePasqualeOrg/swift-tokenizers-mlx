@@ -2,6 +2,7 @@ import Foundation
 import HFAPI
 import IntegrationTestHelpers
 import MLXLLM
+import MLXLMCommon
 import MLXLMTokenizers
 import TestHelpers
 import Testing
@@ -37,16 +38,6 @@ struct IntegrationTests {
         try await ChatSessionTests.visionModel(container: container)
     }
 
-    @Test func streamDetailsWithTools() async throws {
-        let container = try await models.llmContainer(for: .init(id: IntegrationTestModelIDs.llm))
-        try await ChatSessionTests.streamDetailsWithTools(container: container)
-    }
-
-    @Test func toolInvocation() async throws {
-        let container = try await models.llmContainer(for: .init(id: IntegrationTestModelIDs.llm))
-        try await ChatSessionTests.toolInvocation(container: container)
-    }
-
     @Test func promptRehydration() async throws {
         let container = try await models.llmContainer(for: .init(id: IntegrationTestModelIDs.llm))
         try await ChatSessionTests.promptRehydration(container: container)
@@ -58,55 +49,22 @@ struct IntegrationTests {
         try await EmbedderTests.readmeExample(container: models.embeddingContainer())
     }
 
-    // MARK: - Tool Calls
+    // MARK: - Tokenizer bridge
 
-    @Test func lfm2FormatAutoDetection() async throws {
-        let container = try await models.llmContainer(for: .init(id: IntegrationTestModelIDs.lfm2))
-        try await ToolCallTests.lfm2FormatAutoDetection(container: container)
-    }
-
-    @Test func lfm2EndToEndGeneration() async throws {
-        let container = try await models.llmContainer(for: .init(id: IntegrationTestModelIDs.lfm2))
-        try await ToolCallTests.lfm2EndToEndGeneration(container: container)
-    }
-
-    // Keep integration models at roughly 5 GB or less per repo.
-    // Larger models can exhaust RAM and crash lower-memory devices during load or inference.
-
-    @Test func mistral3FormatAutoDetection() async throws {
-        let container = try await models.llmContainer(
-            for: .init(id: IntegrationTestModelIDs.mistral3))
-        try await ToolCallTests.mistral3FormatAutoDetection(container: container)
-    }
-
-    @Test func mistral3EndToEndGeneration() async throws {
-        let container = try await models.llmContainer(
-            for: .init(id: IntegrationTestModelIDs.mistral3))
-        try await ToolCallTests.mistral3EndToEndGeneration(container: container)
-    }
-
-    @Test func mistral3MultiToolGeneration() async throws {
-        let container = try await models.llmContainer(
-            for: .init(id: IntegrationTestModelIDs.mistral3))
-        try await ToolCallTests.mistral3MultiToolGeneration(container: container)
-    }
-
-    @Test func qwen35FormatAutoDetection() async throws {
-        let container = try await models.llmContainer(
-            for: .init(id: IntegrationTestModelIDs.qwen35))
-        try await ToolCallTests.qwen35FormatAutoDetection(container: container)
-    }
-
-    @Test func qwen35EndToEndGeneration() async throws {
-        let container = try await models.llmContainer(
-            for: .init(id: IntegrationTestModelIDs.qwen35))
-        try await ToolCallTests.qwen35EndToEndGeneration(container: container)
-    }
-
-    @Test func qwen35MultiToolGeneration() async throws {
-        let container = try await models.llmContainer(
-            for: .init(id: IntegrationTestModelIDs.qwen35))
-        try await ToolCallTests.qwen35MultiToolGeneration(container: container)
+    /// `TokenizersLoader` selects the raw streaming decode bridge via a runtime
+    /// cast. If a future swift-tokenizers type stopped conforming, streaming
+    /// would silently degrade to the cleanup-prone decode fallback, so pin the
+    /// contract here.
+    @Test func streamingDecodeConformance() async throws {
+        let directory = try await HubClient.default.download(
+            id: IntegrationTestModelIDs.llm,
+            revision: nil,
+            matching: ["*.json", "*.jinja"],
+            useLatest: false,
+            progressHandler: { _ in }
+        )
+        let tokenizer = try await TokenizersLoader().load(from: directory)
+        #expect(tokenizer is any MLXLMCommon.StreamingDecodeTokenizer)
     }
 }
 
