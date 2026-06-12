@@ -17,10 +17,11 @@ let package = Package(
         // blocks versioned consumers, so no new version tags of this package until then.
         .package(url: "https://github.com/DePasqualeOrg/mlx-swift-lm.git", branch: "main"),
         // Minor releases of swift-tokenizers have been API-breaking; bump deliberately.
-        .package(url: "https://github.com/DePasqualeOrg/swift-tokenizers.git", .upToNextMinor(from: "0.7.0")),
-        // 0.4.1 is the floor: its artifactbundle localizes non-FFI Rust globals, fixing
-        // duplicate-symbol link failures alongside other Rust-backed packages.
-        .package(url: "https://github.com/DePasqualeOrg/swift-hf-api.git", .upToNextMinor(from: "0.4.1")),
+        .package(url: "https://github.com/DePasqualeOrg/swift-tokenizers.git", .upToNextMinor(from: "0.7.1")),
+        // 0.4.2 is the floor: its artifactbundle localizes non-FFI Rust globals (fixing
+        // duplicate-symbol link failures alongside other Rust-backed packages) with a
+        // root-driven merge; 0.4.1's Linux x86_64 slice fails consumer links.
+        .package(url: "https://github.com/DePasqualeOrg/swift-hf-api.git", .upToNextMinor(from: "0.4.2")),
     ],
     targets: [
         .target(
